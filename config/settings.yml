@@ -1,0 +1,16 @@
+defaults: &defaults
+  :log_level: info
+  :redis:
+    :host: localhost
+    :port: 6379
+
+:development:
+  <<: *defaults
+  :log_level: debug
+
+:test:
+  <<: *defaults
+
+:production:
+  <<: *defaults
+
