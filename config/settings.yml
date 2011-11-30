@@ -3,6 +3,7 @@ defaults: &defaults
   :redis:
     :host: localhost
     :port: 6379
+  :secret: 'deadcafe'
 
 :development:
   <<: *defaults

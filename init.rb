@@ -30,10 +30,7 @@ end
 Ohm.connect(monk_settings(:redis))
 
 # Load all application files.
-puts "Loading application files"
-puts root_path("app/**/*.rb")
 Dir[root_path("app/**/*.rb")].each do |file|
-  puts file
   require file
 end
 
