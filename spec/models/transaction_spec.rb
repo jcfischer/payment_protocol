@@ -4,12 +4,12 @@ describe Transaction do
 
   let(:params) {
     {amount: 10.50,
-     currency: "EUR",
-     reference_number: "ref_1234",
-     merchant_id: 1234,
-     signature: "ac72e03ccb6ff1b5d203784f9313e38e",
-     uuid: "6bab2c5c-62b8-5d02-c891-f163375635bb"}
-  }
+       currency: "EUR",
+       reference_number: "ref_1234",
+       merchant_id: 1234,
+       signature: "ac72e03ccb6ff1b5d203784f9313e38e",
+       uuid: "6bab2c5c-62b8-5d02-c891-f163375635bb"}
+    }
 
   context "#initialize" do
     [:amount, :currency, :reference_number, :merchant_id, :uuid, :signature].each do |attr|
@@ -17,6 +17,11 @@ describe Transaction do
         transaction = Transaction.new params.to_json
         transaction.send(attr.to_sym).should == params[attr]
       end
+    end
+
+    it "status is :new" do
+      transaction = Transaction.new params.to_json
+      transaction.status.should == :new
     end
   end
 
@@ -64,6 +69,55 @@ describe Transaction do
 
     it "returns a hashed token" do
       transaction.numeric_token(5).should == 49215
+    end
+  end
+
+  context "#== (equality)" do
+
+    it "sees transactions with equal params as equal" do
+      t1 = Transaction.new params.to_json
+      t2 = Transaction.new params.to_json
+      t1.should == t2
+    end
+  end
+
+  context "#save" do
+    let(:transaction) { Transaction.new params.to_json }
+    it "stores itself in the TransactionStore" do
+      TransactionStore.instance.should_receive(:store).with(transaction.token, transaction)
+      transaction.save
+    end
+  end
+
+  context ".find" do
+    let(:transaction) { Transaction.new params.to_json }
+
+    context "transation stored" do
+      before(:each) do
+        TransactionStore.instance.store transaction.token, transaction
+      end
+      it "loads from the TokenStore" do
+        t = Transaction.find transaction.token
+        t.should == transaction
+      end
+    end
+  end
+
+  context "#authorize!" do
+    let(:transaction) { Transaction.new params.to_json }
+
+    it "sets the transaction to authorized" do
+      transaction.authorize!
+      transaction.status.should == :authorized
+    end
+  end
+
+  context "#expire!!" do
+    let(:transaction) { Transaction.new params.to_json }
+
+    it "sets the transaction to expired" do
+      transaction.expire!
+      transaction.status.should == :expired
     end
   end
 end

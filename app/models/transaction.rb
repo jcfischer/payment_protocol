@@ -4,7 +4,7 @@ class NoSecretDefined < RuntimeError; end
 
 class Transaction
 
-  attr_accessor :amount, :currency, :merchant_id, :reference_number, :uuid, :signature, :secret
+  attr_accessor :amount, :currency, :merchant_id, :reference_number, :uuid, :signature, :secret, :status
 
   def initialize params
     params = JSON.parse(params) unless params.class == Hash
@@ -14,6 +14,7 @@ class Transaction
     @reference_number = params['reference_number']
     @uuid = params['uuid']
     @signature = params['signature']
+    @status = :new
   end
 
   def as_params
@@ -22,6 +23,16 @@ class Transaction
      :merchant_id => @merchant_id,
      :reference_number => @reference_number,
      :uuid => @uuid}
+  end
+
+  def == another
+    [:amount, :currency, :merchant_id, :reference_number, :reference_number, :uuid, :secret, :status].all? do |attr|
+      self.send(attr) == another.send(attr)
+    end
+  end
+
+  def save
+    TransactionStore.instance.store self.token, self
   end
 
   # checks to see if the passed signature is equal to the computed signature
@@ -44,5 +55,20 @@ class Transaction
     bits = (n * 3.31)
     token = self.token(bits)
     token.to_i(16)
+  end
+
+  def authorize!
+    @status = :authorized
+  end
+
+
+  def expire!
+    @status = :expired
+  end
+
+  # class methods
+
+  def self.find token
+    TransactionStore.instance.get token
   end
 end

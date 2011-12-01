@@ -14,6 +14,7 @@ class Main
         {:error => "Request already seen by server"}.to_json
       else
         UuidPool.instance.add(transaction.uuid)
+        transaction.save
         status 201
         {:token => transaction.numeric_token(5),
          :transaction_id => transaction.token }.to_json
