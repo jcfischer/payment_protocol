@@ -4,7 +4,8 @@ class NoSecretDefined < RuntimeError; end
 
 class Transaction
 
-  attr_accessor :amount, :currency, :merchant_id, :reference_number, :uuid, :signature, :secret, :status
+  attr_accessor :amount, :currency, :merchant_id, :reference_number, :uuid, :signature, :secret, :status,
+                :num_token, :transaction_id
 
   def initialize params
     params = JSON.parse(params) unless params.class == Hash
@@ -26,7 +27,8 @@ class Transaction
   end
 
   def == another
-    [:amount, :currency, :merchant_id, :reference_number, :reference_number, :uuid, :secret, :status].all? do |attr|
+    [:amount, :currency, :merchant_id, :reference_number, :reference_number, :uuid, :secret, :status,
+    :num_token, :transaction_id].all? do |attr|
       self.send(attr) == another.send(attr)
     end
   end
@@ -44,17 +46,25 @@ class Transaction
   end
 
   # returns a token with the length of n bits (where n is a multiple of 4)
-  def token(n = 128)
+  def hashed_token(n = 128)
     hash = Signum.signature_for(:value => self.as_params, :secret => "salted-#{@secret}").signature
     hex_digits = (n / 4)  -1  # computes the number of chars n bits are represented in
     hash[0..hex_digits]
   end
 
+  def token
+    @token || hashed_token
+  end
+
   # returns a decimal number with n digits
   def numeric_token(n = 6)
     bits = (n * 3.31)
-    token = self.token(bits)
-    token.to_i(16)
+    token = self.hashed_token(bits)
+    @num_token = token.to_i(16)
+  end
+
+  def pre_commit
+    @transaction_id = self.token
   end
 
   def authorize!
@@ -64,6 +74,10 @@ class Transaction
 
   def expire!
     @status = :expired
+  end
+
+  def reject!
+    @status = :rejected
   end
 
   # class methods

@@ -48,19 +48,19 @@ describe Transaction do
     end
   end
 
-  context "#token" do
+  context "#hashed_token" do
     let(:transaction) { Transaction.new params.to_json }
 
     it "returns a hashed token" do
-      transaction.token.should == "c03fd2b9bd74219e53b961ee5d314226"
+      transaction.hashed_token.should == "c03fd2b9bd74219e53b961ee5d314226"
     end
 
     it "returns just a few bits of the token" do
-      transaction.token(16).should == "c03f"
+      transaction.hashed_token(16).should == "c03f"
     end
 
     it "returns 20  bits of the token" do
-      transaction.token(20).should == "c03fd"
+      transaction.hashed_token(20).should == "c03fd"
     end
   end
 
@@ -69,6 +69,11 @@ describe Transaction do
 
     it "returns a hashed token" do
       transaction.numeric_token(5).should == 49215
+    end
+
+    it "sets the token" do
+      t = transaction.numeric_token(5)
+      transaction.num_token.should == t
     end
   end
 
@@ -118,6 +123,14 @@ describe Transaction do
     it "sets the transaction to expired" do
       transaction.expire!
       transaction.status.should == :expired
+    end
+  end
+
+  context "#pre_commit" do
+    let(:transaction) { Transaction.new params.to_json }
+    it "sets the internal transaction id" do
+      transaction.pre_commit
+      transaction.transaction_id.should == transaction.token
     end
   end
 end

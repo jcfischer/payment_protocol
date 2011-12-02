@@ -8,6 +8,7 @@ gem 'ohm', :git => 'git://github.com/soveran/ohm.git'
 gem 'redis-store', :git => 'git://github.com/jodosha/redis-store.git'
 gem 'haml'
 gem 'signum', :git => 'git://github.com/jcfischer/signum.git'
+gem 'uuid'
 
 gem 'rack-flash'
 gem 'thor'
