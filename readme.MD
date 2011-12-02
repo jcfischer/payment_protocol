@@ -1,3 +1,32 @@
+# Open Internet Payment Protocol - OIPP
+
+Sample implemation of an open payment protocol as part of a Thesis for a Masters of Science degree
+in Information Technology at the University of Liverpool.
+
+Jens-Christian Fischer, 2.12.2011
+
+# Installation
+
+## Prerquisites
+
+* Git
+* Ruby 1.9.3
+
+
+## Installation
+
+Clone the repository using
+
+    git clone git@github.com:jcfischer/payment_protocol.git
+
+Enter the directory and install the bundler gem
+
+    gem install bundler
+
+If you receive an error at this point, Ruby is not installed correctly. When bundler is installed, you can install
+the dependencies of the OIPP:
+
+    bundle install
 
 
 
