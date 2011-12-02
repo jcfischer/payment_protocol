@@ -17,7 +17,6 @@ class Main < Monk::Glue
   set :haml, { :format => :html5, :ugly => RACK_ENV == 'development' ? false : true }
 
  
-  redis_server = "redis://#{monk_settings(:redis)[:host]}:#{monk_settings(:redis)[:port]}/0"
   # use Rack::Session::Redis, :redis_server => redis_server
   # use Rack::Flash
   # use Rack::Cache

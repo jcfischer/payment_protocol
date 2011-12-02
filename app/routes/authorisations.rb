@@ -31,6 +31,7 @@ class Main
 
     else
       status 404
+      { error: "Transaction not found", token: params[:token]}.to_json
     end
   end
 end
